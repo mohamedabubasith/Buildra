@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -19,9 +20,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Allow all origins in development; restrict via CORS_ORIGINS env var in production
+# e.g. CORS_ORIGINS=https://buildra.netlify.app,https://yourdomain.com
+_raw_origins = os.getenv("CORS_ORIGINS", "")
+allow_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()] or ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
