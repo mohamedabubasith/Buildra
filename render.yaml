@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: buildra-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:////data/buildra.db
+      - key: TICKETS_DIR
+        value: /data/tickets
+      - key: DOCS_DIR
+        value: /data/docs
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: OPENDEVIN_URL
+        value: http://localhost:3001
+    disk:
+      name: buildra-data
+      mountPath: /data
+      sizeGB: 1

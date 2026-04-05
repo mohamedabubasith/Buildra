@@ -1,0 +1,16 @@
+[build]
+  base    = "frontend"
+  command = "npm run build"
+  publish = "frontend/.next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[context.production.environment]
+  NEXT_PUBLIC_API_URL = "https://buildra-api.onrender.com"
+
+[context.deploy-preview.environment]
+  NEXT_PUBLIC_API_URL = "https://buildra-api.onrender.com"
