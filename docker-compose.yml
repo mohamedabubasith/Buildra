@@ -1,0 +1,45 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./tickets:/tickets
+      - ./docs:/docs
+    environment:
+      - DATABASE_URL=sqlite:////app/buildra.db
+      - TICKETS_DIR=/tickets
+      - DOCS_DIR=/docs
+      - OPENDEVIN_URL=${OPENDEVIN_URL:-http://opendevin:3000}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    depends_on:
+      - opendevin
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  opendevin:
+    image: ghcr.io/opendevin/opendevin:latest
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./workspace:/opt/workspace_base
+    environment:
+      - SANDBOX_USER_ID=${SANDBOX_USER_ID:-1000}
+      - LLM_API_KEY=${LLM_API_KEY:-placeholder}
+      - LLM_MODEL=${LLM_MODEL:-gpt-4o}
+      - LLM_BASE_URL=${LLM_BASE_URL:-}
+    restart: unless-stopped
